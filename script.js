@@ -4,10 +4,10 @@ const gameboard = (function(){
   const getBoard = () => board;
 
   const displayBoard = () => {
-    console.log(board);
-    // for(let i=0; i<board.length; i++){
-    //   console.log(board[i]);
-    // };
+    console.log(board[0] + " " + board[1] + " " + board[2]);
+    console.log(board[3] + " " + board[4] + " " + board[5]);
+    console.log(board[6] + " " + board[7] + " " + board[8]);
+    console.log("endgrid");
   };
 
   const updateBoard = (player, position) => {
@@ -32,42 +32,35 @@ const gameController = (function(){
   let gameInPlay = true;
   const human = player("X");
   const computer = player("O");
-
+  let currentTurn = human;
 
   const playGame = () => {
+  
+    gameboard.displayBoard();
 
-  // gameloop:
-  // while(gameInPlay){
-    
-  // }
-  playerTurn();
-  computerTurn();
-  playerTurn();
-  computerTurn();
-  // 
-    // 
-      
-    //   playerTurn();
-    //   playerWins = checkForWin(human.getSymbol());
-    //   if(playerWins){
-    //     gameInPlay = false;
-    //     console.log("Game over. You win!");
-    //     break gameloop;
-    //   };
-    //   computerTurn();
-    //   computerWins = checkForWin(computer.getSymbol());
-    //   if(computerWins){
-    //     gameInPlay = false;
-    //     console.log("Game over. Computer wins.");
-    //     break gameloop;
-    //   }
-
+    gameloop:
+    while(gameInPlay){
+      if(!playerWins && !computerWins){
+        if(currentTurn === human){
+          playerTurn();
+          playerWins = checkForWin(human.getSymbol());
+          currentTurn = computer;
+        } else if(currentTurn === computer){
+          computerTurn();
+          computerWins = checkForWin(computer.getSymbol());
+          currentTurn = human;
+        }
+      } else {
+        gameInPlay = false;
+        break gameloop;
+      }
+    }
+    console.log("Final result: You win: " + playerWins + " Computer wins: " + computerWins);
   };
 
   //process player
   const playerTurn = () => {
-    let playerInput = null;
-    playerInput = prompt("Select your position: ");
+    let playerInput = prompt("Select your position: ");
     gameboard.updateBoard(human, +playerInput);
     gameboard.displayBoard();
   };
