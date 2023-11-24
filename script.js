@@ -30,10 +30,24 @@ const gameController = (function(){
   let playerWins = false;
   let computerWins = false;
   let gameInPlay = true;
-  const human = player("X");
-  const computer = player("O");
+  let human = null;
+  let computer = null;
   let currentTurn = human;
 
+  const assignCross = () => {
+    human = player("X");
+    computer = player("O");
+    console.log(human.getSymbol());
+    displayController.hideSelectWeapon();
+  }
+  
+  const assignCircle = () => {
+    human = player("O");
+    computer = player("X");
+    console.log(human.getSymbol());
+    displayController.hideSelectWeapon();
+  }
+  
   const playGame = () => {
   
     gameboard.displayBoard();
@@ -56,11 +70,11 @@ const gameController = (function(){
       }
     }
     console.log("Final result: You win: " + playerWins + " Computer wins: " + computerWins);
-  };
+  }
 
   //process player
   const playerTurn = () => {
-    let playerInput = prompt("Select your position: ");
+    //let playerInput = prompt("Select your position: ");
     gameboard.updateBoard(human, +playerInput);
     gameboard.displayBoard();
   };
@@ -100,12 +114,36 @@ const gameController = (function(){
 
   const getComputer = () => computer;
 
-  return {playGame, getComputer};
+  return {playGame, getComputer, assignCross, assignCircle};
+})();
+
+//dom controller
+const displayController = (function() {
+  let selectWeapon;
+  
+  const initialSetup = () => {
+    selectWeapon = document.querySelector(".selectWeapon");
+    const crossBtn = document.querySelector(".crossBtn");
+    const circleBtn = document.querySelector(".circleBtn");
+    crossBtn.addEventListener("click", gameController.assignCross);
+    circleBtn.addEventListener("click", gameController.assignCircle);
+  }
+
+  const hideSelectWeapon = () => {
+    selectWeapon.style.visibility = "hidden";
+  }
+
+  return {initialSetup, hideSelectWeapon};
 })();
 
 
 //main
-gameController.playGame();
+displayController.initialSetup();
+// gameController.playGame();
+
+
+
+
 
 
 
