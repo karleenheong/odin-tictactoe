@@ -39,6 +39,7 @@ const gameController = (function(){
     computer = player("O");
     console.log(human.getSymbol());
     displayController.hideSelectWeapon();
+    displayController.showGameboard();
   }
   
   const assignCircle = () => {
@@ -46,11 +47,12 @@ const gameController = (function(){
     computer = player("X");
     console.log(human.getSymbol());
     displayController.hideSelectWeapon();
+    displayController.showGameboard();
   }
   
   const playGame = () => {
   
-    gameboard.displayBoard();
+    //gameboard.displayBoard();
 
     gameloop:
     while(gameInPlay){
@@ -75,8 +77,8 @@ const gameController = (function(){
   //process player
   const playerTurn = () => {
     //let playerInput = prompt("Select your position: ");
-    gameboard.updateBoard(human, +playerInput);
-    gameboard.displayBoard();
+    // gameboard.updateBoard(human, +playerInput);
+    // gameboard.displayBoard();
   };
 
   //check square for winner
@@ -119,26 +121,43 @@ const gameController = (function(){
 
 //dom controller
 const displayController = (function() {
-  let selectWeapon;
+  const selectWeapon = document.querySelector(".selectWeapon");
+  const gameScreen = document.querySelector(".gameScreen");
   
-  const initialSetup = () => {
-    selectWeapon = document.querySelector(".selectWeapon");
-    const crossBtn = document.querySelector(".crossBtn");
-    const circleBtn = document.querySelector(".circleBtn");
-    crossBtn.addEventListener("click", gameController.assignCross);
-    circleBtn.addEventListener("click", gameController.assignCircle);
-  }
+  const crossBtn = document.querySelector(".crossBtn");
+  const circleBtn = document.querySelector(".circleBtn");
+  crossBtn.addEventListener("click", gameController.assignCross);
+  circleBtn.addEventListener("click", gameController.assignCircle);
+
+  const btn0 = document.querySelector("#btn0");
+  const btn1 = document.querySelector("#btn1");
+  const btn2 = document.querySelector("#btn2");
+  const btn3 = document.querySelector("#btn3");
+  const btn4 = document.querySelector("#btn4");
+  const btn5 = document.querySelector("#btn5");
+  const btn6 = document.querySelector("#btn6");
+  const btn7 = document.querySelector("#btn7");
+  const btn8 = document.querySelector("#btn8");
 
   const hideSelectWeapon = () => {
-    selectWeapon.style.visibility = "hidden";
+    selectWeapon.style.display = "none";
   }
 
-  return {initialSetup, hideSelectWeapon};
+  const showGameboard = () => {
+    gameScreen.style.display = "block";
+  }
+
+  const hideGameboard = () => {
+    gameScreen.style.display= "none";
+  }
+
+  hideGameboard();
+
+  return {hideSelectWeapon, showGameboard, hideGameboard};
 })();
 
 
 //main
-displayController.initialSetup();
 // gameController.playGame();
 
 
