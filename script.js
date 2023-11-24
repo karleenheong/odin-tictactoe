@@ -257,13 +257,16 @@ const displayController = (function() {
   }
 
   const displayGameEnd = (player) => {
+    const resultsDiv = document.querySelector(".results");
+    let text = document.createElement("h3");
     if(player === gameController.getHuman()){
-      console.log("You win!");
+      text.textContent = "You win!";
     } else if(player === gameController.getComputer()){
-      console.log("You lose. Comp wins");
+      text.textContent = "You lose.";
     } else {
-      console.log("no one wins");
+      text.textContent = "It's a draw";
     }
+    resultsDiv.append(text);
     for(let i=0; i<squareBtns.length; i++){
       squareBtns[i].disabled = true;
     }
