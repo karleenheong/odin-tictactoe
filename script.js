@@ -55,29 +55,29 @@ const gameController = (function(){
     displayController.showGameboard();
   }
   
-  const playGame = () => {
+  // const playGame = () => {
   
-    //gameboard.displayBoard();
+  //   //gameboard.displayBoard();
 
-  //   gameloop:
-  //   while(gameInPlay){
-  //     if(!playerWins && !computerWins){
-  //       if(currentTurn === human){
-  //         humanTurn();
-  //         playerWins = checkForWin(human.getSymbol());
-  //         currentTurn = computer;
-  //       } else if(currentTurn === computer){
-  //         computerTurn();
-  //         computerWins = checkForWin(computer.getSymbol());
-  //         currentTurn = human;
-  //       }
-  //     } else {
-  //       gameInPlay = false;
-  //       break gameloop;
-  //     }
-  //   }
-  //   console.log("Final result: You win: " + playerWins + " Computer wins: " + computerWins);
-  }
+  // //   gameloop:
+  // //   while(gameInPlay){
+  // //     if(!playerWins && !computerWins){
+  // //       if(currentTurn === human){
+  // //         humanTurn();
+  // //         playerWins = checkForWin(human.getSymbol());
+  // //         currentTurn = computer;
+  // //       } else if(currentTurn === computer){
+  // //         computerTurn();
+  // //         computerWins = checkForWin(computer.getSymbol());
+  // //         currentTurn = human;
+  // //       }
+  // //     } else {
+  // //       gameInPlay = false;
+  // //       break gameloop;
+  // //     }
+  // //   }
+  // //   console.log("Final result: You win: " + playerWins + " Computer wins: " + computerWins);
+  // }
 
   //process player
   const humanTurn = (square) => {
@@ -132,24 +132,43 @@ const gameController = (function(){
     let won = false;
     let board = gameboard.getBoard();
     let symbol = player.getSymbol();
-    if(
-      (board[0] === symbol && board[1] === symbol && board[2] === symbol) ||
-      (board[0] === symbol && board[4] === symbol && board[8] === symbol) ||
-      (board[0] === symbol && board[3] === symbol && board[6] === symbol) ||
-      (board[1] === symbol && board[4] === symbol && board[7] === symbol) ||
-      (board[2] === symbol && board[5] === symbol && board[8] === symbol) ||
-      (board[2] === symbol && board[4] === symbol && board[6] === symbol) ||
-      (board[3] === symbol && board[4] === symbol && board[5] === symbol) ||
-      (board[6] === symbol && board[7] === symbol && board[8] === symbol)
-      ){
-        won = true;
-        displayController.displayGameEnd(player);
-      } else {
-        if(player === human){
-          gameController.computerTurn();
-        } 
-      }
+    let gameEnded = checkGameEnded();
+
+    if(!gameEnded){
+      if(
+        (board[0] === symbol && board[1] === symbol && board[2] === symbol) ||
+        (board[0] === symbol && board[4] === symbol && board[8] === symbol) ||
+        (board[0] === symbol && board[3] === symbol && board[6] === symbol) ||
+        (board[1] === symbol && board[4] === symbol && board[7] === symbol) ||
+        (board[2] === symbol && board[5] === symbol && board[8] === symbol) ||
+        (board[2] === symbol && board[4] === symbol && board[6] === symbol) ||
+        (board[3] === symbol && board[4] === symbol && board[5] === symbol) ||
+        (board[6] === symbol && board[7] === symbol && board[8] === symbol)
+        ){
+          won = true;
+          displayController.displayGameEnd(player);
+        } else {
+          if(player === human){
+            computerTurn();
+          } 
+        }
+    } else {
+      displayController.displayGameEnd("noone");
+    }
   };
+
+  const checkGameEnded = () => {
+    let gameEnded;
+    let board = gameboard.getBoard();
+    for(let i=0; i<board.length; i++){
+      if(board[i] !== "X" || board[i] !== "O"){
+        gameEnded = false;
+      } else {
+        gameEnded = true;
+      }
+    }
+    return gameEnded;
+  }
 
   //process computer
   const computerTurn = () => {
@@ -159,16 +178,20 @@ const gameController = (function(){
       if(board[i] === ""){
         availablePositions.push(i);
       }
-    };
-    let randomNum = Math.floor(Math.random() * availablePositions.length);
-    gameboard.updateBoard(gameController.getComputer(), availablePositions[randomNum]);
-    displayController.updateButton("computer", availablePositions[randomNum]);
+    }
+    if(availablePositions.length > 0){
+      let randomNum = Math.floor(Math.random() * availablePositions.length);
+      gameboard.updateBoard(gameController.getComputer(), availablePositions[randomNum]);
+      displayController.updateButton("computer", availablePositions[randomNum]);
+    } else {
+      displayController.displayGameEnd("noone");
+    }
   }
 
   const getComputer = () => computer;
   const getHuman = () => human;
 
-  return {playGame, getComputer, getHuman, assignCross, assignCircle, humanTurn, checkForWin, computerTurn};
+  return {getComputer, getHuman, assignCross, assignCircle, humanTurn, checkForWin, computerTurn};
 })();
 
 //dom controller
