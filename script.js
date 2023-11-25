@@ -28,20 +28,29 @@ const player = () => {
   let background = null;
   let score = 0;
 
+  const setSymbol = (sym) => {
+    symbol = sym;
+    if(sym === "X"){
+      icon = "url(./graphics/cross.png)";
+      background = "rgb(38, 216, 207)";
+    } else {
+      icon = "url(./graphics/circle.png)";
+      background = "lightskyblue";
+    }
+  }
+
   const getName = () => name;
   const setName = (playerName) => name = playerName;
   const getType = () => type;
   const setType = (playerType) => type = playerType;
   const getSymbol = () => symbol;
-  const setSymbol = (sym) => symbol = sym;
   const getIcon = () => icon;
-  const setIcon = (pic) => icon = pic;
   const getBG = () => background;
-  const setBG = (pic) => background = pic;
   const getScore = () => score;
   const addToScore = () => score++;
 
-  return {getType, setType, getName, setName, getSymbol, setSymbol, getIcon, setIcon, getBG, setBG, getScore, addToScore};
+  
+  return {getType, setType, getName, setName, getSymbol, setSymbol, getIcon, getBG, getScore, addToScore};
 }
 
 
@@ -61,30 +70,25 @@ const gameController = (function(){
     } else if(button.id === "humanVsComp"){
       players[0].setType("human");
       players[1].setType("computer");
-    } else if(button.id === "compVsComp"){
-      players[0].setType("computer");
-      players[1].setType("computer");
     } else {
       console.log("player select error");
     }
     displayController.processPlayerNames();
   }
 
-  const assignCross = () => {
-    playerOne = player("X");
-    playerTwo = player("O");
-    displayController.setIcons("cross");
+  const assignWeapon = (weaponBtn) => {
+    if(weaponBtn.id === "crossBtn"){
+      players[0].setSymbol("X");
+      players[1].setSymbol("O");
+    } else if(weaponBtn.id === "circleBtn"){
+      players[0].setSymbol("O");
+      players[1].setSymbol("X");
+    } else {
+      console.log("error assigning weapon");
+    }
     displayController.hideSelectWeapon();
     displayController.showGameboard();
-  }
-  
-  const assignCircle = () => {
-    playerOne = player("O");
-    playerTwo = player("X");
-    displayController.setIcons("circle");
-    displayController.hideSelectWeapon();
-    displayController.showGameboard();
-  }
+  } 
 
   //Process Human Player
   const humanTurn = (square) => {
@@ -205,7 +209,7 @@ const gameController = (function(){
   // const getPlayerOne = () => playerOne;
   const getRounds = () => rounds;
 
-  return {determinePlayers, getPlayers, assignCross, assignCircle, humanTurn, checkForWin, computerTurn, getRounds};
+  return {determinePlayers, getPlayers, assignWeapon, humanTurn, checkForWin, computerTurn, getRounds};
 })();
 
 
@@ -232,10 +236,12 @@ const displayController = (function() {
     });
   }
 
-  const crossBtn = document.querySelector(".crossBtn");
-  const circleBtn = document.querySelector(".circleBtn");
-  crossBtn.addEventListener("click", gameController.assignCross);
-  circleBtn.addEventListener("click", gameController.assignCircle);
+  const weaponBtns = document.querySelectorAll(".weapon");
+  for(let i=0; i<weaponBtns.length; i++){
+    weaponBtns[i].addEventListener("click", function(){
+      gameController.assignWeapon(this);
+    });
+  }
 
   const squareBtns = document.querySelectorAll(".square");
   for(let i=0; i<squareBtns.length; i++){
@@ -243,11 +249,6 @@ const displayController = (function() {
       gameController.humanTurn(this);
     });
   };
-
-  let playerOneIcon;
-  let playerTwoIcon;
-  let playerOneBG;
-  let playerTwoBG;
 
   //Player Names Screen
   const processPlayerNames = () => {
@@ -291,21 +292,6 @@ const displayController = (function() {
     nameText.textContent = "Choose your weapon, " + players[0].getName() + ":";
     nameText.style.padding = "30px 0";
     weaponText.appendChild(nameText);
-  }
-
-
-  const setIcons = (icon) => {
-    if(icon === "cross"){
-      playerOneIcon = "url(./graphics/cross.png)";
-      playerOneBG = "rgb(38, 216, 207)";
-      playerTwoIcon = "url(./graphics/circle.png)";
-      playerTwoBG = "lightskyblue";
-    } else {
-      playerOneIcon = "url(./graphics/circle.png)";
-      playerOneBG = "lightskyblue";
-      playerTwoIcon = "url(./graphics/cross.png)";
-      playerTwoBG = "rgb(38, 216, 207)";
-    }
   }
 
   const updateSquare = (player, num) => {
@@ -412,7 +398,7 @@ const displayController = (function() {
   hideRestart();
   hideScore();
 
-  return {processPlayerNames, hideSelectWeapon, showGameboard, hideGameboard, updateSquare, setIcons, displayGameEnd};
+  return {processPlayerNames, hideSelectWeapon, showGameboard, hideGameboard, updateSquare, displayGameEnd};
 })();
 
 
