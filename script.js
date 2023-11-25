@@ -18,19 +18,22 @@ const gameboard = (function(){
 function player(sym){
   const symbol = sym;
   let name;
+  let score = 0;
 
   const getSymbol = () => symbol;
+  const getScore = () => score;
 
   const getName = () => name;
   const setName = (playerName) => name = playerName;
 
-  return {getSymbol, getName, setName};
+  return {getSymbol, getName, setName, getScore};
 };
 
 
 const gameController = (function(){
   let human = null;
   let computer = null;
+  let rounds = 0;
 
   const assignCross = () => {
     human = player("X");
@@ -112,6 +115,7 @@ const gameController = (function(){
         (board[6] === symbol && board[7] === symbol && board[8] === symbol)
         ){
           won = true;
+          rounds++;
           displayController.displayGameEnd(player);
         } else {
           if(player === human){
@@ -119,6 +123,7 @@ const gameController = (function(){
           } 
         }
     } else {
+      rounds++;
       displayController.displayGameEnd("noone");
     }
   };
@@ -156,8 +161,9 @@ const gameController = (function(){
 
   const getComputer = () => computer;
   const getHuman = () => human;
+  const getRounds = () => rounds;
 
-  return {getComputer, getHuman, assignCross, assignCircle, humanTurn, checkForWin, computerTurn};
+  return {getComputer, getHuman, assignCross, assignCircle, humanTurn, checkForWin, computerTurn, getRounds};
 })();
 
 //dom controller
@@ -173,7 +179,7 @@ const displayController = (function() {
   let computerBG;
 
   const restartGame = () => {
-    hideGameboard();
+    console.log(gameController.getRounds());
     hideRestart();
     //destroy resultsDiv text
     while(resultsDiv.firstChild){
@@ -181,7 +187,9 @@ const displayController = (function() {
     }
     gameboard.resetBoard();
     resetSquares();
-    showSelectWeapon();
+    if(gameController.getRounds() % 2 !== 0){
+      gameController.computerTurn();
+    }
   }
   
   const crossBtn = document.querySelector(".crossBtn");

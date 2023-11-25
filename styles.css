@@ -4,6 +4,10 @@
   font-family: Tahoma, sans-serif;
 }
 
+body {
+  padding: 30px;
+}
+
 h1, h2 {
   text-align: center;
   padding: 15px 0;
