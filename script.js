@@ -1,4 +1,4 @@
-//---------- GAME BOARD DATA -------------
+//---------- GAME BOARD OBJECT -------------
 
 const gameboard = (function(){
   let board = ["", "", "", "", "", "", "", "", ""];
@@ -13,7 +13,6 @@ const gameboard = (function(){
   //Check Square for Winner
   const checkForWin = (player) => {
     let symbol = player.getSymbol();
-    console.log(board);
     if(
       (board[0] === symbol && board[1] === symbol && board[2] === symbol) ||
       (board[0] === symbol && board[4] === symbol && board[8] === symbol) ||
@@ -41,11 +40,7 @@ const gameboard = (function(){
       if(board[i] === ""){
         isFull = false;
       }
-      // if(board[i] !== "X" || board[i] !== "O"){
-      //   isFull = false;
-      // }
     }
-    console.log(isFull);
     return isFull;
   }
   
@@ -241,7 +236,6 @@ const gameController = (function(){
     gameEnded = true;
     rounds++;
     turns = 0;
-    console.log("draw");
     displayController.displayGameEnd(null);
   }
 
@@ -311,6 +305,7 @@ const displayController = (function() {
         nameScreen.appendChild(inputBox);
       }
     }
+    let newDiv = document.createElement("div");
     let newBtn = document.createElement("button");
     newBtn.className = "submitName";
     newBtn.textContent = "Let's Begin!";
@@ -319,12 +314,11 @@ const displayController = (function() {
       let inputBoxes = document.querySelectorAll(".inputBox");
       for(let i=0; i<inputBoxes.length; i++){
         players[i].setName(inputBoxes[i].value);
-        console.log(players[i].getName());
       }
       processWeaponSelect(players);
     });
-    
-    nameScreen.appendChild(newBtn);
+    newDiv.appendChild(newBtn);
+    nameScreen.appendChild(newDiv);
   }
 
   //Weapon Select Screen
@@ -350,6 +344,7 @@ const displayController = (function() {
     squareBtns[num].disabled = true;
   }
 
+  //Update text above game grid
   const updateTurnText = (player) => {
     while(selectSquare.firstChild){
       selectSquare.removeChild(selectSquare.firstChild);
@@ -365,6 +360,7 @@ const displayController = (function() {
     selectSquare.appendChild(text);
   }
 
+  //Show results
   const displayGameEnd = (player) => {
     let text = document.createElement("h2");
     if(player !== null){
@@ -386,8 +382,7 @@ const displayController = (function() {
     playerOneScore.textContent = players[0].getName() + ": " + players[0].getScore();
     playerTwoScore.textContent = players[1].getName() + ": " + players[1].getScore();
   }
-
-
+  
   const restartGame = () => {
     hideRestart();
     //destroy resultsDiv text
@@ -419,7 +414,6 @@ const displayController = (function() {
     };
   }
 
-
   const showRestart = () => {
     restart.style.display = "block";
   }
@@ -439,7 +433,7 @@ const displayController = (function() {
     gameScreen.style.display= "none";
   }
   const showScore = () => {
-    scorePanel.style.display = "block";
+    scorePanel.style.display = "flex";
   }
   const hideScore = () => {
     scorePanel.style.display = "none";
