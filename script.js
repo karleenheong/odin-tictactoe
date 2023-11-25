@@ -113,6 +113,7 @@ const gameController = (function(){
     } else if(button.id === "humanVsComp"){
       players[0].setType("human");
       players[1].setType("computer");
+      players[1].setName("Robot Overlord");
       gameType = "humanVsComp";
     } else {
       console.log("player select error");
@@ -206,8 +207,6 @@ const gameController = (function(){
       let randomNum = Math.floor(Math.random() * availablePositions.length);
       gameboard.updateBoard(players[1], availablePositions[randomNum]);
       displayController.updateSquare(players[1], availablePositions[randomNum]);
-      turns++;
-      displayController.updateTurnText(players[0]);
     } else {
       displayController.displayGameEnd(null);
     }
@@ -223,7 +222,11 @@ const gameController = (function(){
     } else {
       currentPlayer = players[0];
     }
-    displayController.updateTurnText(currentPlayer);
+    if(currentPlayer.getType() === "human"){
+      displayController.updateTurnText(currentPlayer);
+    } else {
+      computerTurn();
+    }
   }
 
   const triggerWinner = (player) => {
