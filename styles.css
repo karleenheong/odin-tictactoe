@@ -102,8 +102,10 @@ h1, h2, h3 {
 }
 
 .playerScore {
-  font-size: 30px;
+  font-size: 22px;
   text-align: center;
+  font-family: Tahoma, sans-serif;
+  font-weight: 500;
 }
 
 .playerSelectBtns {
