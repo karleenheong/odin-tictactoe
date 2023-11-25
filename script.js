@@ -22,74 +22,75 @@ function player(sym){
 
   const getSymbol = () => symbol;
   const getScore = () => score;
+  const addToScore = () => score++;
 
   const getName = () => name;
   const setName = (playerName) => name = playerName;
 
-  return {getSymbol, getName, setName, getScore};
+  return {getSymbol, getName, setName, getScore, addToScore};
 };
 
 
 const gameController = (function(){
-  let human = null;
-  let computer = null;
+  let playerOne = null;
+  let playerTwo = null;
   let rounds = 0;
 
   const assignCross = () => {
-    human = player("X");
-    computer = player("O");
+    playerOne = player("X");
+    playerTwo = player("O");
     displayController.setIcons("cross");
     displayController.hideSelectWeapon();
     displayController.showGameboard();
   }
   
   const assignCircle = () => {
-    human = player("O");
-    computer = player("X");
+    playerOne = player("O");
+    playerTwo = player("X");
     displayController.setIcons("circle");
     displayController.hideSelectWeapon();
     displayController.showGameboard();
   }
 
   //process player
-  const humanTurn = (square) => {
+  const playerOneTurn = (square) => {
 
     switch(square.id){
       case "btn0":
-        gameboard.updateBoard(human, 0);
-        displayController.updateButton(human, 0);
+        gameboard.updateBoard(playerOne, 0);
+        displayController.updateButton(playerOne, 0);
         break;
       case "btn1":
-        gameboard.updateBoard(human, 1);
-        displayController.updateButton(human, 1);
+        gameboard.updateBoard(playerOne, 1);
+        displayController.updateButton(playerOne, 1);
         break;
       case "btn2":
-        gameboard.updateBoard(human, 2);
-        displayController.updateButton(human, 2);
+        gameboard.updateBoard(playerOne, 2);
+        displayController.updateButton(playerOne, 2);
         break;
       case "btn3":
-        gameboard.updateBoard(human, 3);
-        displayController.updateButton(human, 3);
+        gameboard.updateBoard(playerOne, 3);
+        displayController.updateButton(playerOne, 3);
         break;
       case "btn4":
-        gameboard.updateBoard(human, 4);
-        displayController.updateButton(human, 4);
+        gameboard.updateBoard(playerOne, 4);
+        displayController.updateButton(playerOne, 4);
         break;
       case "btn5":
-        gameboard.updateBoard(human, 5);
-        displayController.updateButton(human, 5);
+        gameboard.updateBoard(playerOne, 5);
+        displayController.updateButton(playerOne, 5);
         break;
       case "btn6":
-        gameboard.updateBoard(human, 6);
-        displayController.updateButton(human, 6);
+        gameboard.updateBoard(playerOne, 6);
+        displayController.updateButton(playerOne, 6);
         break;
       case "btn7":
-        gameboard.updateBoard(human, 7);
-        displayController.updateButton(human, 7);
+        gameboard.updateBoard(playerOne, 7);
+        displayController.updateButton(playerOne, 7);
         break;
       case "btn8":
-        gameboard.updateBoard(human, 8);
-        displayController.updateButton(human, 8);
+        gameboard.updateBoard(playerOne, 8);
+        displayController.updateButton(playerOne, 8);
         break;
       default:
         console.log("error on player turn");
@@ -116,10 +117,11 @@ const gameController = (function(){
         ){
           won = true;
           rounds++;
+          addToScore(player);
           displayController.displayGameEnd(player);
         } else {
-          if(player === human){
-            computerTurn();
+          if(player === playerOne){
+            playerTwoTurn();
           } 
         }
     } else {
@@ -127,6 +129,10 @@ const gameController = (function(){
       displayController.displayGameEnd("noone");
     }
   };
+
+  const addToScore = (player) => {
+    player.addToScore();
+  }
 
   const checkGameEnded = () => {
     let gameEnded;
@@ -141,8 +147,8 @@ const gameController = (function(){
     return gameEnded;
   }
 
-  //process computer
-  const computerTurn = () => {
+  //process playerTwo
+  const playerTwoTurn = () => {
     let board = gameboard.getBoard();
     let availablePositions = [];
     for(let i=0; i<board.length; i++){
@@ -152,18 +158,18 @@ const gameController = (function(){
     }
     if(availablePositions.length > 0){
       let randomNum = Math.floor(Math.random() * availablePositions.length);
-      gameboard.updateBoard(gameController.getComputer(), availablePositions[randomNum]);
-      displayController.updateButton("computer", availablePositions[randomNum]);
+      gameboard.updateBoard(gameController.getPlayerTwo(), availablePositions[randomNum]);
+      displayController.updateButton("playerTwo", availablePositions[randomNum]);
     } else {
       displayController.displayGameEnd("noone");
     }
   }
 
-  const getComputer = () => computer;
-  const getHuman = () => human;
+  const getPlayerTwo = () => playerTwo;
+  const getPlayerOne = () => playerOne;
   const getRounds = () => rounds;
 
-  return {getComputer, getHuman, assignCross, assignCircle, humanTurn, checkForWin, computerTurn, getRounds};
+  return {getPlayerTwo, getPlayerOne, assignCross, assignCircle, playerOneTurn, checkForWin, playerTwoTurn, getRounds};
 })();
 
 //dom controller
@@ -173,10 +179,14 @@ const displayController = (function() {
   const restart = document.querySelector(".restart");
   const restartBtn = document.querySelector(".playAgain");
   const resultsDiv = document.querySelector(".results");
-  let humanIcon;
-  let computerIcon;
-  let humanBG;
-  let computerBG;
+  const scorePanel = document.querySelector(".scorePanel");
+  const playerOneScore = document.querySelector(".playerOneScore");
+  const playerTwoScore = document.querySelector(".playerTwoScore");
+
+  let playerOneIcon;
+  let playerTwoIcon;
+  let playerOneBG;
+  let playerTwoBG;
 
   const restartGame = () => {
     console.log(gameController.getRounds());
@@ -188,7 +198,7 @@ const displayController = (function() {
     gameboard.resetBoard();
     resetSquares();
     if(gameController.getRounds() % 2 !== 0){
-      gameController.computerTurn();
+      gameController.playerTwoTurn();
     }
   }
   
@@ -200,7 +210,7 @@ const displayController = (function() {
   squareBtns = document.querySelectorAll(".square");
   for(let i=0; i<squareBtns.length; i++){
     squareBtns[i].addEventListener("click", function(){
-      gameController.humanTurn(this);
+      gameController.playerOneTurn(this);
     });
   };
 
@@ -217,41 +227,25 @@ const displayController = (function() {
 
   const setIcons = (icon) => {
     if(icon === "cross"){
-      humanIcon = "url(./graphics/cross.png)";
-      humanBG = "rgb(38, 216, 207)";
-      computerIcon = "url(./graphics/circle.png)";
-      computerBG = "lightskyblue";
+      playerOneIcon = "url(./graphics/cross.png)";
+      playerOneBG = "rgb(38, 216, 207)";
+      playerTwoIcon = "url(./graphics/circle.png)";
+      playerTwoBG = "lightskyblue";
     } else {
-      humanIcon = "url(./graphics/circle.png)";
-      humanBG = "lightskyblue";
-      computerIcon = "url(./graphics/cross.png)";
-      computerBG = "rgb(38, 216, 207)";
+      playerOneIcon = "url(./graphics/circle.png)";
+      playerOneBG = "lightskyblue";
+      playerTwoIcon = "url(./graphics/cross.png)";
+      playerTwoBG = "rgb(38, 216, 207)";
     }
   }
 
-  const hideSelectWeapon = () => {
-    selectWeapon.style.display = "none";
-  }
-
-  const showSelectWeapon = () => {
-    selectWeapon.style.display = "block";
-  }
-
-  const showGameboard = () => {
-    gameScreen.style.display = "block";
-  }
-
-  const hideGameboard = () => {
-    gameScreen.style.display= "none";
-  }
-
   const updateButton = (player, num) => {
-    if(player === gameController.getHuman()) {
-      squareBtns[num].style.backgroundImage = humanIcon;
-      squareBtns[num].style.backgroundColor = humanBG;
+    if(player === gameController.getPlayerOne()) {
+      squareBtns[num].style.backgroundImage = playerOneIcon;
+      squareBtns[num].style.backgroundColor = playerOneBG;
     } else {
-      squareBtns[num].style.backgroundImage = computerIcon;
-      squareBtns[num].style.backgroundColor = computerBG;
+      squareBtns[num].style.backgroundImage = playerTwoIcon;
+      squareBtns[num].style.backgroundColor = playerTwoBG;
     }
     squareBtns[num].style.opacity = "100";
     squareBtns[num].style.backgroundSize = "75% 75%"; 
@@ -262,30 +256,51 @@ const displayController = (function() {
 
   const displayGameEnd = (player) => {
     let text = document.createElement("h3");
-    if(player === gameController.getHuman()){
+    if(player === gameController.getPlayerOne()){
       text.textContent = "You win!";
-    } else if(player === gameController.getComputer()){
+    } else if(player === gameController.getPlayerTwo()){
       text.textContent = "You lose.";
     } else {
       text.textContent = "It's a draw";
     }
+    showScore();
     resultsDiv.append(text);
     for(let i=0; i<squareBtns.length; i++){
       squareBtns[i].disabled = true;
     }
     showRestart();
+    playerOneScore.textContent = gameController.getPlayerOne().getScore();
+    playerTwoScore.textContent = gameController.getPlayerTwo().getScore();
   }
 
   const showRestart = () => {
     restart.style.display = "block";
   }
-
   const hideRestart = () => {
     restart.style.display = "none";
+  }
+  const showSelectWeapon = () => {
+    selectWeapon.style.display = "block";
+  }
+  const hideSelectWeapon = () => {
+    selectWeapon.style.display = "none";
+  }
+  const showGameboard = () => {
+    gameScreen.style.display = "block";
+  }
+  const hideGameboard = () => {
+    gameScreen.style.display= "none";
+  }
+  const showScore = () => {
+    scorePanel.style.display = "block";
+  }
+  const hideScore = () => {
+    scorePanel.style.display = "none";
   }
 
   hideGameboard();
   hideRestart();
+ // hideScore();
 
   return {hideSelectWeapon, showGameboard, hideGameboard, updateButton, setIcons, displayGameEnd};
 })();
