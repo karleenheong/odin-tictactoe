@@ -7,7 +7,6 @@ const gameboard = (function(){
 
   const updateBoard = (player, position) => {
     board[position] = player.getSymbol();
-    gameController.checkForWin(player);
   }
 
   const resetBoard = () => {
@@ -58,7 +57,9 @@ const player = () => {
 
 const gameController = (function(){
   let players = [];
-  let rounds = 0;
+  let turns = 0; // a turn
+  let rounds = 0; // a whole game
+  let gameType = "";
 
   players[0] = player();
   players[1] = player();
@@ -67,9 +68,11 @@ const gameController = (function(){
     if(button.id === "humanVsHuman"){
       players[0].setType("human");
       players[1].setType("human");
+      gameType = "humanVsHuman";
     } else if(button.id === "humanVsComp"){
       players[0].setType("human");
       players[1].setType("computer");
+      gameType = "humanVsComp";
     } else {
       console.log("player select error");
     }
@@ -88,51 +91,60 @@ const gameController = (function(){
     }
     displayController.hideSelectWeapon();
     displayController.showGameboard();
+    displayController.updateTurnText(players[1]);
   } 
 
   //Process Human Player
   const humanTurn = (square) => {
+    let currentPlayer;
+    if(turns % 2 === 0){
+      currentPlayer = players[0];
+    } else {
+      currentPlayer = players[1];
+    }
 
     switch(square.id){
       case "btn0":
-        gameboard.updateBoard(playerOne, 0);
-        displayController.updateSquare(playerOne, 0);
+        gameboard.updateBoard(currentPlayer, 0);
+        displayController.updateSquare(currentPlayer, 0);
         break;
       case "btn1":
-        gameboard.updateBoard(playerOne, 1);
-        displayController.updateSquare(playerOne, 1);
+        gameboard.updateBoard(currentPlayer, 1);
+        displayController.updateSquare(currentPlayer, 1);
         break;
       case "btn2":
-        gameboard.updateBoard(playerOne, 2);
-        displayController.updateSquare(playerOne, 2);
+        gameboard.updateBoard(currentPlayer, 2);
+        displayController.updateSquare(currentPlayer, 2);
         break;
       case "btn3":
-        gameboard.updateBoard(playerOne, 3);
-        displayController.updateSquare(playerOne, 3);
+        gameboard.updateBoard(currentPlayer, 3);
+        displayController.updateSquare(currentPlayer, 3);
         break;
       case "btn4":
-        gameboard.updateBoard(playerOne, 4);
-        displayController.updateSquare(playerOne, 4);
+        gameboard.updateBoard(currentPlayer, 4);
+        displayController.updateSquare(currentPlayer, 4);
         break;
       case "btn5":
-        gameboard.updateBoard(playerOne, 5);
-        displayController.updateSquare(playerOne, 5);
+        gameboard.updateBoard(currentPlayer, 5);
+        displayController.updateSquare(currentPlayer, 5);
         break;
       case "btn6":
-        gameboard.updateBoard(playerOne, 6);
-        displayController.updateSquare(playerOne, 6);
+        gameboard.updateBoard(currentPlayer, 6);
+        displayController.updateSquare(currentPlayer, 6);
         break;
       case "btn7":
-        gameboard.updateBoard(playerOne, 7);
-        displayController.updateSquare(playerOne, 7);
+        gameboard.updateBoard(currentPlayer, 7);
+        displayController.updateSquare(currentPlayer, 7);
         break;
       case "btn8":
-        gameboard.updateBoard(playerOne, 8);
-        displayController.updateSquare(playerOne, 8);
+        gameboard.updateBoard(currentPlayer, 8);
+        displayController.updateSquare(currentPlayer, 8);
         break;
       default:
         console.log("error on player turn");
     }
+
+    checkForWin(currentPlayer);
   };
 
   //Process Computer Player
@@ -146,8 +158,8 @@ const gameController = (function(){
     }
     if(availablePositions.length > 0){
       let randomNum = Math.floor(Math.random() * availablePositions.length);
-      gameboard.updateBoard(gameController.getPlayerTwo(), availablePositions[randomNum]);
-      displayController.updateSquare("playerTwo", availablePositions[randomNum]);
+      gameboard.updateBoard(players[1], availablePositions[randomNum]);
+      displayController.updateSquare(players[1], availablePositions[randomNum]);
     } else {
       displayController.displayGameEnd("noone");
     }
@@ -176,9 +188,10 @@ const gameController = (function(){
           addToScore(player);
           displayController.displayGameEnd(player);
         } else {
-          if(player === playerOne){
+          if(gameType === "humanVsComp"){
             computerTurn();
           } 
+          turns++;
         }
     } else {
       rounds++;
@@ -205,8 +218,6 @@ const gameController = (function(){
   }
 
   const getPlayers = () => players;
-  // const getPlayerTwo = () => playerTwo;
-  // const getPlayerOne = () => playerOne;
   const getRounds = () => rounds;
 
   return {determinePlayers, getPlayers, assignWeapon, humanTurn, checkForWin, computerTurn, getRounds};
@@ -228,6 +239,7 @@ const displayController = (function() {
   const playerSelect = document.querySelector(".playerSelect");
   const nameScreen = document.querySelector(".nameScreen");
   const weaponText = document.querySelector(".weaponText");
+  const selectSquare = document.querySelector(".selectSquare");
 
   const playerSelectBtns = document.querySelectorAll(".playerSelectBtn");
   for(let i=0; i<playerSelectBtns.length; i++){
@@ -288,25 +300,41 @@ const displayController = (function() {
     hideNameScreen();
     showSelectWeapon();
 
-    let nameText = document.createElement("h2");
+    let nameText = document.createElement("p");
     nameText.textContent = "Choose your weapon, " + players[0].getName() + ":";
     nameText.style.padding = "30px 0";
     weaponText.appendChild(nameText);
   }
 
+  //Update Square Tile Graphics
   const updateSquare = (player, num) => {
-    if(player === gameController.getPlayerOne()) {
-      squareBtns[num].style.backgroundImage = playerOneIcon;
-      squareBtns[num].style.backgroundColor = playerOneBG;
-    } else {
-      squareBtns[num].style.backgroundImage = playerTwoIcon;
-      squareBtns[num].style.backgroundColor = playerTwoBG;
-    }
+    squareBtns[num].style.backgroundImage = player.getIcon();
+    squareBtns[num].style.backgroundColor = player.getBG();
+
     squareBtns[num].style.opacity = "100";
     squareBtns[num].style.backgroundSize = "75% 75%"; 
     squareBtns[num].style.backgroundRepeat = "no-repeat"; 
     squareBtns[num].style.backgroundPosition = "center"; 
     squareBtns[num].disabled = true;
+    updateTurnText(player);
+  }
+
+  const updateTurnText = (player) => {
+    let players = gameController.getPlayers();
+    let nextPlayer;
+    if(player === players[0]){
+      nextPlayer = players[1];
+    } else {
+      nextPlayer = players[0];
+    }
+    if(nextPlayer.getType() === "human"){
+      while(selectSquare.firstChild){
+        selectSquare.removeChild(selectSquare.firstChild);
+      }
+      let text = document.createElement("p");
+      text.textContent = "Select a square, " + nextPlayer.getName() + ":";
+      selectSquare.appendChild(text);
+    }
   }
 
   const displayGameEnd = (player) => {
@@ -398,7 +426,7 @@ const displayController = (function() {
   hideRestart();
   hideScore();
 
-  return {processPlayerNames, hideSelectWeapon, showGameboard, hideGameboard, updateSquare, displayGameEnd};
+  return {processPlayerNames, hideSelectWeapon, showGameboard, hideGameboard, updateSquare, updateTurnText, displayGameEnd};
 })();
 
 
