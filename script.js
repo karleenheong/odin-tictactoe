@@ -160,6 +160,7 @@ const gameController = (function(){
       let randomNum = Math.floor(Math.random() * availablePositions.length);
       gameboard.updateBoard(players[1], availablePositions[randomNum]);
       displayController.updateSquare(players[1], availablePositions[randomNum]);
+      checkForWin(players[1]);
     } else {
       displayController.displayGameEnd("noone");
     }
@@ -167,7 +168,6 @@ const gameController = (function(){
 
   //Check Square for Winner
   const checkForWin = (player) => {
-    let won = false;
     let board = gameboard.getBoard();
     let symbol = player.getSymbol();
     let gameEnded = checkGameEnded();
@@ -183,25 +183,21 @@ const gameController = (function(){
         (board[3] === symbol && board[4] === symbol && board[5] === symbol) ||
         (board[6] === symbol && board[7] === symbol && board[8] === symbol)
         ){
-          won = true;
+          //found winning combo
           rounds++;
-          addToScore(player);
+          player.addToScore();
           displayController.displayGameEnd(player);
-        } else {
-          if(gameType === "humanVsComp"){
-            computerTurn();
-          } 
-          turns++;
-        }
+      } else { //continue game
+        if((gameType === "humanVsComp") && (player.getType() === "human")){
+          computerTurn();
+        } 
+        turns++;
+      }
     } else {
       rounds++;
       displayController.displayGameEnd("noone");
     }
   };
-
-  const addToScore = (player) => {
-    player.addToScore();
-  }
 
   //Check Gameboard Still Has Space
   const checkGameEnded = () => {
@@ -326,7 +322,7 @@ const displayController = (function() {
       nextPlayer = players[1];
     } else {
       nextPlayer = players[0];
-    }
+    }1
     if(nextPlayer.getType() === "human"){
       while(selectSquare.firstChild){
         selectSquare.removeChild(selectSquare.firstChild);
